@@ -1,7 +1,7 @@
 {
   "name": "coldstorage",
   "description": "An immutable dispatcher for use in a unidirectional Flux architecture",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "license": "MIT",
   "main": "src/coldstorage.js",
   "files": [

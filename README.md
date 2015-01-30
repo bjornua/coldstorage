@@ -1,2 +1,2 @@
 # coldstorage
-A immutable dispatcher inspired by flux
+An immutable dispatcher inspired by flux

@@ -20,7 +20,7 @@
         {
             "jslint": {
                 "@disable": false,
-                "args": ["--edition=latest", "--node=false", "--vars=true", "--nomen=true", "--regexp=true"],
+                "args": ["--edition=latest", "--node=true", "--vars=true", "--nomen=true", "--regexp=true"],
                 "excludes": []
             }
         }

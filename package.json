@@ -4,6 +4,9 @@
   "version": "0.1.0",
   "license": "MIT",
   "main": "src/coldstorage.js",
+  "files": [
+    "README.md"
+  ],
   "author": "Bjørn Uhre Arnholtz <bjorn.arnholtz@gmail.com>",
   "repository": {
     "type": "git",

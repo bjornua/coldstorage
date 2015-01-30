@@ -1,0 +1,28 @@
+{
+    "folders": [
+        {
+            "folder_exclude_patterns": [
+                "node_modules",
+                ".npm",
+                "build"
+
+            ],
+            "follow_symlinks": false,
+            "path": "."
+        }
+    ],
+    "settings": {
+        "tab_size": 4
+    },
+    "SublimeLinter":
+    {
+        "linters":
+        {
+            "jslint": {
+                "@disable": false,
+                "args": ["--edition=latest", "--node=false", "--vars=true", "--nomen=true", "--regexp=true"],
+                "excludes": []
+            }
+        }
+    }
+}

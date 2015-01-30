@@ -1,0 +1,5 @@
+/build
+/node_modules
+/project.sublime-workspace
+/.npm
+/npm-debug.log

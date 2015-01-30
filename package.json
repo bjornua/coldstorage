@@ -1,0 +1,21 @@
+{
+  "name": "coldstorage",
+  "description": "An immutable dispatcher for use in a unidirectional Flux architecture",
+  "version": "0.1.0",
+  "license": "MIT",
+  "main": "src/coldstorage.js",
+  "author": "Bjørn Uhre Arnholtz <bjorn.arnholtz@gmail.com>",
+  "repository": {
+		"type": "git",
+		"url": "https://github.com/bjornua/coldstorage"
+	},
+  "devDependencies": {
+		"nodeunit": "^0.9.0"
+  },
+  "dependencies": {
+		"immutable": "^3.6.2"
+  },
+  "scripts": {
+		"test": "nodeunit test.js"
+  }
+}

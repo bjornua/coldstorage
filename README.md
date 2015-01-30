@@ -4,7 +4,7 @@
 
 # coldstorage
 
-An immutable dispatcher inspired by flux
+Immutable dispatcher for the flux architecture
 
 
 [npm-image]: https://img.shields.io/npm/v/coldstorage.svg?style=flat-square

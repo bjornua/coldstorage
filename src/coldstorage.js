@@ -2,7 +2,9 @@
 
 var _ = require('lodash');
 var Immutable = require('immutable');
+var List = Immutable.List;
 
+var Stores = require('./store');
 
 var DispatchNode = Immutable.Record({
     listens: Immutable.Set(),
@@ -66,7 +68,6 @@ var generateQueue = function (action, listeners) {
     return queue;
 };
 
-
 var initState = new (Immutable.Record({
     stores: Immutable.Map(),
     listeners: Immutable.Map(),
@@ -113,14 +114,15 @@ var initState = new (Immutable.Record({
             throw new Error(format('Action {} is unhandled', actionID));
         }
         var nodes = this.actions.get(actionID);
-        var actionEmit = Immutable.Map().set(actionID, payload);
+        var actionEmit = Immutable.Map().set(actionID, Immutable.fromJS(payload));
         var emitted = Immutable.Map();
         nodes.forEach(function (node) {
             var stores = this.stores.merge(emitted).merge(actionEmit);
-            var availStores = node.listens.add(node.emits).toMap().map(function (storeID) {
+            var availStores = node.listens.toList().map(function (storeID) {
                 return stores.get(storeID);
             });
-            var res = node.get('callback')(availStores);
+            var self = this.stores.get(node.emits, Immutable.Map());
+            var res = node.get('callback').apply(self, availStores.toArray());
 
             emitted = emitted.set(node.emits, res);
         }, this);
@@ -131,6 +133,19 @@ var create = function (nodesData) {
     var state = initState;
     return state.init(nodesData);
 };
+
+var fromStores = function (stores) {
+    stores = Immutable.List(stores);
+    var nodes = stores.map(function (store) {
+        return store.nodes;
+    }).flatten(1);
+
+    return create(nodes);
+};
+
 module.exports = {
-    create: create
+    create: create,
+    createActions: require('./action').createActions,
+    createStore: Stores.createStore,
+    fromStores: fromStores
 };

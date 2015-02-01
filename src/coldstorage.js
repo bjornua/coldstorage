@@ -66,7 +66,6 @@ var generateQueue = function (action, listeners) {
     return queue;
 };
 
-
 var initState = new (Immutable.Record({
     stores: Immutable.Map(),
     listeners: Immutable.Map(),
@@ -131,6 +130,9 @@ var create = function (nodesData) {
     var state = initState;
     return state.init(nodesData);
 };
+
 module.exports = {
-    create: create
+    create: create,
+    createActions: require('./action').createActions,
+    createStore: require('./store').createActions
 };

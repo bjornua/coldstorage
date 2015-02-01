@@ -14,7 +14,7 @@ var createActions = function (actions) {
 
     var obj = {};
     actions = actions.map(function (name) {
-        var list =  Immutable.List([id, name]);
+        var list = Immutable.List([id, name]);
         obj[name] = list;
     });
     id += 1;

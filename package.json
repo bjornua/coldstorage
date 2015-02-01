@@ -5,7 +5,7 @@
   "license": "MIT",
   "main": "./src/coldstorage.js",
   "files": [
-    "src/coldstorage.js",
+    "src",
     "README.md"
   ],
   "author": "Bjørn Uhre Arnholtz <bjorn.arnholtz@gmail.com>",

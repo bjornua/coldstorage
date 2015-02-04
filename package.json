@@ -16,6 +16,15 @@
   "devDependencies": {
     "nodeunit": "^0.9.0"
   },
+  "eslintConfig": {
+    "env": {
+        "browser": true,
+        "node": true,
+    },
+    "rules": {
+      "new-cap": false,
+    }
+  },
   "dependencies": {
     "immutable": "^3.6.2",
     "lodash": "^3.0.1"

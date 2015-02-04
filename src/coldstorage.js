@@ -1,10 +1,9 @@
-'use strict';
+"use strict";
 
-var _ = require('lodash');
-var Immutable = require('immutable');
-var List = Immutable.List;
+var _ = require("lodash");
+var Immutable = require("immutable");
 
-var Stores = require('./store');
+var Stores = require("./store");
 
 var DispatchNode = Immutable.Record({
     listens: Immutable.Set(),
@@ -14,7 +13,7 @@ var DispatchNode = Immutable.Record({
 
 function format(msg) {
     var args = _.toArray(arguments).slice(1);
-    msg = msg.split('{}');
+    msg = msg.split("{}");
     msg = _.map(msg, function (m, i) {
         if (i + 1 === msg.length) {
             return [m];
@@ -46,24 +45,24 @@ var generateQueue = function (action, listeners) {
     var nodes = getTotalListeningNodes(action, listeners);
     var emitters = Immutable.Set();
     var queue = Immutable.List();
+    var readyNode;
     nodes.forEach(function (node) {
         if (emitters.has(node.emits)) {
-            throw new Error(format('{}: {} emits twice', action, node.emits));
+            throw new Error(format("{}: {} emits twice", action, node.emits));
         }
         emitters = emitters.add(node.emits);
     });
     var isReady = function (node) {
         return emitters.intersect(node.listens).isEmpty();
     };
-    var node;
     while (!nodes.isEmpty()) {
-        node = nodes.find(isReady);
-        if (node === undefined) {
-            throw new Error(format('Cycle detected in {}', action));
+        readyNode = nodes.find(isReady);
+        if (readyNode === undefined) {
+            throw new Error(format("Cycle detected in {}", action));
         }
-        nodes = nodes.remove(node);
-        emitters = emitters.remove(node.emits);
-        queue = queue.push(node);
+        nodes = nodes.remove(readyNode);
+        emitters = emitters.remove(readyNode.emits);
+        queue = queue.push(readyNode);
     }
     return queue;
 };
@@ -79,15 +78,15 @@ var initState = new (Immutable.Record({
         var emitters = this.emitters;
         Immutable.fromJS(nodesData).forEach(function (nodeData) {
             var node = new DispatchNode();
-            node = node.set('emits', nodeData.get(0));
+            node = node.set("emits", nodeData.get(0));
 
             if (!Immutable.List.isList(nodeData.get(1)) || nodeData.get(1).isEmpty()) {
-                throw new Error('Listens must be a non-empty array.');
+                throw new Error("Listens must be a non-empty array.");
             }
-            node = node.mergeIn(['listens'], nodeData.get(1));
-            node = node.set('callback', nodeData.get(2));
+            node = node.mergeIn(["listens"], nodeData.get(1));
+            node = node.set("callback", nodeData.get(2));
             if (node.emits === undefined) {
-                throw new Error('Missing emit target.');
+                throw new Error("Missing emit target.");
             }
             node.listens.forEach(function (emitter) {
                 listeners = listeners.update(emitter, Immutable.List(), function (l) {
@@ -111,7 +110,7 @@ var initState = new (Immutable.Record({
     },
     dispatch: function (actionID, payload) {
         if (!this.actions.has(actionID)) {
-            throw new Error(format('Action {} is unhandled', actionID));
+            throw new Error(format("Action {} is unhandled", actionID));
         }
         var nodes = this.actions.get(actionID);
         var actionEmit = Immutable.Map().set(actionID, Immutable.fromJS(payload));
@@ -122,11 +121,11 @@ var initState = new (Immutable.Record({
                 return stores.get(storeID);
             });
             var self = this.stores.get(node.emits, Immutable.Map());
-            var res = node.get('callback').apply(self, availStores.toArray());
+            var res = node.get("callback").apply(self, availStores.toArray());
 
             emitted = emitted.set(node.emits, res);
         }, this);
-        return this.mergeIn(['stores'], emitted);
+        return this.mergeIn(["stores"], emitted);
     }
 }))();
 var create = function (nodesData) {
@@ -145,7 +144,7 @@ var fromStores = function (stores) {
 
 module.exports = {
     create: create,
-    createActions: require('./action').createActions,
+    createActions: require("./action").createActions,
     createStore: Stores.createStore,
     fromStores: fromStores
 };

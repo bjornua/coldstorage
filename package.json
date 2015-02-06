@@ -19,10 +19,10 @@
   "eslintConfig": {
     "env": {
         "browser": true,
-        "node": true,
+        "node": true
     },
     "rules": {
-      "new-cap": false,
+      "new-cap": false
     }
   },
   "dependencies": {

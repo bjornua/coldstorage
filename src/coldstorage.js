@@ -4,6 +4,7 @@ var _ = require("lodash");
 var Immutable = require("immutable");
 
 var Stores = require("./store");
+var Action = require("./action");
 
 var DispatchNode = Immutable.Record({
     listens: Immutable.Set(),
@@ -41,6 +42,7 @@ var getTotalListeningNodes = function (action, listeners) {
     }
     return visited;
 };
+
 var generateQueue = function (action, listeners) {
     var nodes = getTotalListeningNodes(action, listeners);
     var emitters = Immutable.Set();
@@ -101,7 +103,6 @@ var initState = new (Immutable.Record({
         actionKeys.forEach(function (actionName) {
             actions = actions.set(actionName, generateQueue(actionName, listeners, emitters));
         });
-
         return this.merge({
             listeners: listeners,
             emitters: emitters,
@@ -128,6 +129,7 @@ var initState = new (Immutable.Record({
         return this.mergeIn(["stores"], emitted);
     }
 }))();
+
 var create = function (nodesData) {
     var state = initState;
     return state.init(nodesData);
@@ -144,7 +146,8 @@ var fromStores = function (stores) {
 
 module.exports = {
     create: create,
-    createActions: require("./action").createActions,
     createStore: Stores.createStore,
-    fromStores: fromStores
+    fromStores: fromStores,
+    createActions: Action.createActions,
+    Action: Action.Action
 };

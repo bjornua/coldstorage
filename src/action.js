@@ -12,9 +12,16 @@ var id = 0;
 var createActions = function (actions) {
     actions = Immutable.List(actions);
 
+    if (actions.size === 0) {
+        throw new Error("You didn't specify any action names");
+    }
+
     var obj = {};
     actions = actions.map(function (name) {
-        var list = Immutable.List([id, name]);
+        if ('string' !== typeof name) {
+            throw new TypeError('Action name must be of type string');
+        }
+        var list = new Action({prefix: id, name: name});
         obj[name] = list;
     });
     id += 1;
@@ -22,4 +29,7 @@ var createActions = function (actions) {
 };
 
 
-module.exports.createActions = createActions;
+module.exports = {
+    Action: Action,
+    createActions: createActions
+};

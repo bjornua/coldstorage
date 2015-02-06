@@ -1,6 +1,7 @@
 'use strict';
 
 var Immutable = require('immutable');
+var Action = require('./action');
 
 var Store = Immutable.Record({
     name: undefined,
@@ -11,7 +12,10 @@ var Store = Immutable.Record({
             if (val instanceof Store) {
                 return val.name;
             }
-            return val;
+            if (val instanceof Action.Action) {
+                return val;
+            }
+            throw new TypeError('Cannot listen object of type ' + typeof val);
         });
 
         return this.set('nodes', this.nodes.push(
@@ -21,6 +25,9 @@ var Store = Immutable.Record({
 }, 'Store');
 
 var createStore = function (name) {
+    if ('string' !== typeof name) {
+        throw new TypeError('Store name must be of type string');
+    }
     return new Store({name: name});
 };
 

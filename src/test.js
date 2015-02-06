@@ -1,45 +1,9 @@
 /*global require, module */
 'use strict';
 var coldstorage = require('./coldstorage');
+var Immutable = require('immutable');
 
 var noop = function () { return; };
-
-exports.newFormat = {
-    realWorld: function (test) {
-        var actions = coldstorage.createActions(['login', 'logout']);
-
-        var userStore = coldstorage.createStore('user');
-        userStore = userStore.on([actions.login], function (login) {
-            var authed = login.get('username') === 'admin' && login.get('password') === '1234';
-            return this.set('authed', authed);
-        });
-
-        userStore = userStore.on([actions.logout], function () {
-            return this.set('authed', false);
-        });
-        var alertStore = coldstorage.createStore('alert');
-
-        alertStore = alertStore.on([userStore], function (user) {
-            var authed = user.get('authed');
-            if (authed === true) {
-                return this.set('message', 'You were logged in');
-            }
-            return this.set('message', 'You were logged out');
-        });
-
-        var dispatcher = coldstorage.fromStores([
-            userStore,
-            alertStore
-        ]);
-        var login_ok = dispatcher.dispatch(actions.login, {'username': 'admin', 'password': '1234'});
-        var login_fail = dispatcher.dispatch(actions.login, {'username': 'admin', 'password': '1235'});
-
-        console.log(login_ok.stores);
-        console.log(login_fail.stores);
-
-        test.done();
-    }
-};
 
 exports.create = {
     empty: function (test) {
@@ -143,6 +107,100 @@ exports.dispatch = {
         test.strictEqual(stores.get('A'), 'Hello World');
         test.strictEqual(stores.get('B'), 'Hello World!');
         test.strictEqual(stores.get('C'), 'Bonjour World! == Hello World!');
+
+        test.done();
+    }
+};
+
+exports.action = {
+    create: function (test) {
+        var actions = coldstorage.createActions(['login', 'logout']);
+        test.notStrictEqual(actions.login, undefined);
+        test.ok(actions.login instanceof coldstorage.Action);
+        test.strictEqual(actions.login.name, 'login');
+        test.strictEqual(actions.logout.name, 'logout');
+        test.strictEqual(actions.a, undefined);
+        test.ok(Object.isFrozen(actions));
+
+        test.throws(
+            function () { coldstorage.createActions([undefined]); },
+            /^Action name must be of type string$/
+        );
+        test.throws(
+            function () { coldstorage.createActions([1]); },
+            /^Action name must be of type string$/
+        );
+        test.throws(
+            function () { coldstorage.createActions([]); },
+            /^You didn't specify any action names$/
+        );
+
+        test.done();
+    }
+};
+
+exports.store = {
+    create: function (test) {
+        var store = coldstorage.createStore('test');
+        test.strictEqual(store.name, 'test');
+        test.ok(Immutable.is(store.nodes, Immutable.List()));
+        test.done();
+    },
+    noName: function (test) {
+        test.throws(function () {
+            var store = coldstorage.createStore();
+        }, /Store name must be of type string/);
+        test.done();
+    },
+    on: function (test) {
+        var store = coldstorage.createStore('test');
+        test.ok('function' === typeof store.on);
+        test.throws(function () {
+            store.on([{}]);
+        }, /^Cannot listen object of type object$/);
+        test.throws(function () {
+            store.on([undefined]);
+        }, /^Cannot listen object of type undefined$/);
+
+        store = store.on();
+
+        test.done();
+    }
+};
+
+
+exports.realWorld = {
+    realWorld: function (test) {
+        var actions = coldstorage.createActions(['login', 'logout']);
+
+        var userStore = coldstorage.createStore('user');
+        userStore = userStore.on([actions.login], function (login) {
+            var authed = login.get('username') === 'admin' && login.get('password') === '1234';
+            return this.set('authed', authed);
+        });
+
+        userStore = userStore.on([actions.logout], function () {
+            return this.set('authed', false);
+        });
+        var alertStore = coldstorage.createStore('alert');
+
+        alertStore = alertStore.on([userStore], function (user) {
+            var authed = user.get('authed');
+            if (authed === true) {
+                return this.set('message', 'You were logged in');
+            }
+            return this.set('message', 'You were logged out');
+        });
+
+        var dispatcher = coldstorage.fromStores([
+            userStore,
+            alertStore
+        ]);
+        var login_ok = dispatcher.dispatch(actions.login, {'username': 'admin', 'password': '1234'});
+        var login_fail = dispatcher.dispatch(actions.login, {'username': 'admin', 'password': '1235'});
+
+        test.deepEqual(login_ok.stores.toJS(), {user: {authed: true}, alert: {message: "You were logged in"}});
+        test.deepEqual(login_fail.stores.toJS(), {user: {authed: false}, alert: {message: "You were logged out"}});
 
         test.done();
     }

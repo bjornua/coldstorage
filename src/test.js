@@ -73,7 +73,8 @@ exports.dispatch = {
 
         test.throws(
             function () { dispatcher.dispatch('action', ''); },
-            /^Action "action" is unhandled$/);
+            /^Action "action" is unhandled$/
+        );
         test.done();
     },
     single: function (test) {

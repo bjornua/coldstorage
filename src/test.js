@@ -71,9 +71,9 @@ exports.dispatch = {
     unhandledAction: function (test) {
         var dispatcher = coldstorage.create([]);
 
-        test.throws(function () {
-            dispatcher.dispatch('action', {});
-        }, /^Action "action" is unhandled$/);
+        test.throws(
+            function () { dispatcher.dispatch('action', ''); },
+            /^Action "action" is unhandled$/);
         test.done();
     },
     single: function (test) {
@@ -93,15 +93,15 @@ exports.dispatch = {
     },
     triple: function (test) {
         var dispatcher = coldstorage.create([
-            ['C', ['greet', 'B'], function (greet, B) { return 'Bonjour ' + greet + '! == ' + B; }],
-            ['A', ['greet'], function (greet) { return 'Hello ' + greet; }],
+            ['C', ['greet', 'B'], function (greet, B) { return 'Bonjour ' + greet.get('who') + '! == ' + B; }],
+            ['A', ['greet'], function (greet) { return 'Hello ' + greet.get('who'); }],
             ['B', ['A'], function (A) { return A + '!'; }]
         ]);
         var action = dispatcher.actions.get('greet');
         test.strictEqual(action.get(0).emits, 'A');
         test.strictEqual(action.get(1).emits, 'B');
 
-        dispatcher = dispatcher.dispatch('greet', 'World');
+        dispatcher = dispatcher.dispatch('greet', {who: 'World'});
         var stores = dispatcher.stores;
         test.strictEqual(stores.size, 3);
         test.strictEqual(stores.get('A'), 'Hello World');

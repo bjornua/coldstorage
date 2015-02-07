@@ -148,7 +148,7 @@ exports.store = {
     },
     noName: function (test) {
         test.throws(function () {
-            var store = coldstorage.createStore();
+            coldstorage.createStore();
         }, /Store name must be of type string/);
         test.done();
     },
@@ -157,10 +157,10 @@ exports.store = {
         test.ok('function' === typeof store.on);
         test.throws(function () {
             store.on([{}]);
-        }, /^Cannot listen object of type object$/);
+        }, /^Cannot listen to object of type object$/);
         test.throws(function () {
             store.on([undefined]);
-        }, /^Cannot listen object of type undefined$/);
+        }, /^Cannot listen to object of type undefined$/);
 
         store = store.on();
 

@@ -8,14 +8,19 @@ var Store = Immutable.Record({
     nodes: Immutable.List(),
     on: function (deps, f) {
         deps = Immutable.List(deps);
+
+        var wrongVal = deps.filter(function (val) {
+            return !(val instanceof Action.Action) && !(val instanceof Store);
+        });
+        if (wrongVal.size > 0) {
+            throw new TypeError('Cannot listen to object of type ' + typeof wrongVal.get(0));
+        }
+
         deps = deps.map(function (val) {
             if (val instanceof Store) {
                 return val.name;
             }
-            if (val instanceof Action.Action) {
-                return val;
-            }
-            throw new TypeError('Cannot listen object of type ' + typeof val);
+            return val;
         });
 
         return this.set('nodes', this.nodes.push(

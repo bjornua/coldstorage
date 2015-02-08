@@ -94,7 +94,9 @@ exports.dispatch = {
     },
     triple: function (test) {
         var dispatcher = coldstorage.create([
-            ['C', ['greet', 'B'], function (greet, B) { return 'Bonjour ' + greet.get('who') + '! == ' + B; }],
+            ['C', ['greet', 'B'], function (greet, B) {
+                return 'Bonjour ' + greet.get('who') + '! == ' + B;
+            }],
             ['A', ['greet'], function (greet) { return 'Hello ' + greet.get('who'); }],
             ['B', ['A'], function (A) { return A + '!'; }]
         ]);

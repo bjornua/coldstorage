@@ -113,8 +113,19 @@ var initState = new (Immutable.Record({
         if (!this.actions.has(actionID)) {
             throw new Error(format("Action {} is unhandled", actionID));
         }
+        if (payload === undefined) {
+            payload = Immutable.Map();
+        } else {
+            payload = Immutable.fromJS(payload);
+        }
+
+        if (!(payload instanceof Immutable.Map)) {
+            throw new Error('Payload must be of type map');
+        }
+
+
         var nodes = this.actions.get(actionID);
-        var actionEmit = Immutable.Map().set(actionID, Immutable.fromJS(payload));
+        var actionEmit = Immutable.Map().set(actionID, Immutable.Map(payload));
         var emitted = Immutable.Map();
         nodes.forEach(function (node) {
             var stores = this.stores.merge(emitted).merge(actionEmit);

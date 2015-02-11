@@ -5,10 +5,10 @@
 [![Downloads][downloads-image]][downloads-url]
 Immutable dispatcher for the flux architecture.
 
-### Features:
+### Features
 
 * Fully immutable API. `dispatcher.dispatch` returns a new state.
-* Uses and some times returns  https://github.com/facebook/immutable-js objects.
+* Returns immutable [facebook/immutable-js](https://github.com/facebook/immutable-js) objects.
 * Changes can only be initiated by actions
 * Stores can listen to stores
 * Stores can listen to actions
@@ -24,7 +24,7 @@ in your project.
 
 Coldstorage runs both in Node and the browser via browserify (or the like).
 
-# Example Usage:
+# Example Usage
 ## Creating actions
 You create actions by passing an array of strings into `coldstorage.createActions`:
 ```javascript
@@ -69,7 +69,9 @@ console.log(userstore.get('authed'));
 console.log(userstore.get('username'));
 ```
 # Contribution
-Requests and discussion are very welcomed in https://github.com/bjornua/coldstorage/issues
+Requests and discussion are very welcomed in [github issues](https://github.com/bjornua/coldstorage/issues)
+
+Use github pull requests to contribute patches.
 
 # License
 `coldstorage` is MIT-licensed.

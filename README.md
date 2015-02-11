@@ -72,7 +72,7 @@ console.log(userstore.get('username'));
 Requests and discussion are very welcomed in https://github.com/bjornua/coldstorage/issues
 
 # License
-`coldstorage` is BSD-licensed.
+`coldstorage` is MIT-licensed.
 
 [npm-image]: https://img.shields.io/npm/v/coldstorage.svg?style=flat-square
 [npm-url]: https://npmjs.org/package/coldstorage

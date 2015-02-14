@@ -6,6 +6,7 @@ var Immutable = require('immutable');
 var noop = function () { return; };
 
 exports.create = {
+    // LEGACY
     empty: function (test) {
         var state = coldstorage.create([]);
         test.equal(state.listeners.size, 0);
@@ -13,6 +14,7 @@ exports.create = {
         test.equal(state.actions.size, 0);
         test.done();
     },
+    // LEGACY
     missingDepsArg: function (test) {
         test.throws(function () {
             coldstorage.create([[]]);
@@ -22,6 +24,7 @@ exports.create = {
         }, /^Listens must be a non-empty array\.$/);
         test.done();
     },
+    // LEGACY
     single: function (test) {
         var state = coldstorage.create([['A', ['action'], noop]]);
         var listeners = state.listeners;
@@ -41,12 +44,14 @@ exports.create = {
         test.strictEqual(actions.getIn(['action', 0, 'emits']), 'A');
         test.done();
     },
+    // LEGACY
     cycle1: function (test) {
         test.throws(function () {
             coldstorage.create([['A', ['A', 'action1'], noop]]);
         }, /^Cycle detected in "action1"$/);
         test.done();
     },
+    // LEGACY
     cycle2: function (test) {
         test.throws(function () {
             coldstorage.create([
@@ -56,6 +61,7 @@ exports.create = {
         }, /^Cycle detected in "action2"$/);
         test.done();
     },
+    // LEGACY
     dupe: function (test) {
         test.throws(function () {
             coldstorage.create([
@@ -68,6 +74,7 @@ exports.create = {
     }
 };
 exports.dispatch = {
+    // LEGACY
     unhandledAction: function (test) {
         var dispatcher = coldstorage.create([]);
 
@@ -77,6 +84,7 @@ exports.dispatch = {
         );
         test.done();
     },
+    // LEGACY
     single: function (test) {
         var dispatcher = coldstorage.create([
             ['A', ['action'], function () { return 'lololoo'; }]
@@ -92,6 +100,7 @@ exports.dispatch = {
 
         test.done();
     },
+    // LEGACY
     triple: function (test) {
         var dispatcher = coldstorage.create([
             ['C', ['greet', 'B'], function (greet, B) {
@@ -116,6 +125,7 @@ exports.dispatch = {
 };
 
 exports.action = {
+    // LEGACY
     create: function (test) {
         var actions = coldstorage.createActions(['login', 'logout']);
         test.notStrictEqual(actions.login, undefined);
@@ -143,18 +153,21 @@ exports.action = {
 };
 
 exports.store = {
+    // LEGACY
     create: function (test) {
         var store = coldstorage.createStore('test');
         test.strictEqual(store.name, 'test');
         test.ok(Immutable.is(store.nodes, Immutable.List()));
         test.done();
     },
+    // LEGACY
     noName: function (test) {
         test.throws(function () {
             var store = coldstorage.createStore();
         }, /Store name must be of type string/);
         test.done();
     },
+    // LEGACY
     on: function (test) {
         var store = coldstorage.createStore('test');
         test.ok('function' === typeof store.on);
@@ -173,6 +186,7 @@ exports.store = {
 
 
 exports.realWorld = {
+    // LEGACY
     realWorld: function (test) {
         var actions = coldstorage.createActions(['login', 'logout']);
 

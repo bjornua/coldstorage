@@ -22,3 +22,17 @@ exports.createStore = {
         test.done();
     }
 };
+
+exports.createActions = {
+    normal: function (test) {
+        coldstorage.createActions('1');
+        test.done();
+    },
+    empty: function (test) {
+        test.throws(
+            function () { coldstorage.createActions(); },
+            /^You didn't specify any action names$/
+        );
+        test.done();
+    }
+}

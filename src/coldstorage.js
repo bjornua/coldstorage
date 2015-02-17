@@ -3,11 +3,16 @@ var Immutable = require("immutable");
 
 var Action = require("./action");
 
-
 var Store = Immutable.Record({
-    emitterKey: undefined,
-    emitterFunc: undefined
+    key: undefined,
+    func: undefined,
+    _state: Immutable.Map()
 }, 'Store');
+
+var Dispatcher = Immutable.Record({
+    '': undefined,
+    _state: Immutable.Map()
+}, 'Dispatcher');
 
 var format = function (msg) {
     var args = Immutable.Seq(arguments);
@@ -39,10 +44,10 @@ var assert = function (condition, msg) {
     }
 };
 
-var createStore = function (emitterKey, emitterFunc) {
-    assert('string' === typeof emitterKey, 'emitterKey must be of type string');
-    assert('function' === typeof emitterFunc, 'emitterFunc must be of type function');
-    return new Store({emitterKey: emitterKey, emitterFunc: emitterFunc});
+var createStore = function (key, func) {
+    assert('string' === typeof key, 'key must be of type string');
+    assert('function' === typeof func, 'func must be of type function');
+    return new Store({key: key, func: func});
 };
 var Immutable = require('immutable');
 
@@ -69,8 +74,21 @@ var createActions = function () {
 };
 
 
-var createDispatcher = function (emitters) {
+var createDispatcher = function (stores) {
+    stores = Immutable.fromJS(stores);
 
+    if (stores === undefined) {
+        stores = Immutable.List();
+    }
+
+    assert(Immutable.List.isList(stores), 'Stores must be an Array or undefined');
+    assert(stores.every(function (val) {
+        return val instanceof Store;
+    }), 'Every item in `stores` must be created by coldstorage.createStore');
+
+    return Object.freeze({
+        stores: stores
+    });
 };
 
 

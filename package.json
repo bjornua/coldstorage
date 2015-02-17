@@ -3,7 +3,7 @@
   "description": " Immutable dispatcher for the flux architecture",
   "version": "0.1.5",
   "license": "MIT",
-  "main": "./src/coldstorage.js",
+  "main": "./src/index.js",
   "files": [
     "src",
     "README.md"
@@ -14,12 +14,13 @@
     "url": "https://github.com/bjornua/coldstorage"
   },
   "devDependencies": {
+    "eslint": "^0.14.1",
     "nodeunit": "^0.9.0"
   },
   "eslintConfig": {
     "env": {
-        "browser": true,
-        "node": true
+      "browser": true,
+      "node": true
     },
     "rules": {
       "new-cap": false
@@ -30,6 +31,6 @@
     "lodash": "^3.0.1"
   },
   "scripts": {
-    "test": "nodeunit src/test.js"
+    "test": "nodeunit src/test.js && eslint src"
   }
 }

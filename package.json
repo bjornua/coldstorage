@@ -27,8 +27,7 @@
     }
   },
   "dependencies": {
-    "immutable": "^3.6.2",
-    "lodash": "^3.0.1"
+    "immutable": "^3.6.2"
   },
   "scripts": {
     "test": "nodeunit src/test.js && eslint src"

@@ -8,7 +8,7 @@ var noop = function () { return; };
 exports.createStore = {
     normal: function (test) {
         var state = Coldstorage.createStore("name", noop);
-        test.deepEqual(state.toJS(), {key: "name", func: noop, _state: {}});
+        test.deepEqual(state.toJS(), {key: "name", func: noop, _state: {}, exports: true});
         test.done();
     },
     wrongName: function (test) {
@@ -37,7 +37,8 @@ exports.createActions = {
 };
 exports.createDispatcher = {
     empty: function (test) {
-        Coldstorage.createDispatcher();
+        var dispatcher = Coldstorage.createDispatcher();
+        test.strictEqual(typeof dispatcher.dispatch, "function");
         test.done();
     },
     nonStore: function (test) {
@@ -48,16 +49,35 @@ exports.createDispatcher = {
         test.done();
     },
     normal: function (test) {
-        var store = Coldstorage.createStore("lololo", function (old) {
+        var store = Coldstorage.createStore("a", function (old) {
             return old.set("hello", "hi");
         });
-
         var dispatcher = Coldstorage.createDispatcher([
             store
         ]);
-        test.strictEqual(typeof dispatcher.dispatch, "function");
         dispatcher = dispatcher.dispatch("something");
-
+        test.deepEqual(
+            dispatcher.serialize(),
+            {"a": {"hello": "hi"}}
+        );
+        test.done();
+    },
+    cycle: function (test) {
+        var storeA, storeB;
+        storeA = Coldstorage.createStore("a", function (old, get) {
+            get(storeB);
+        });
+        storeB = Coldstorage.createStore("b", function (old, get) {
+            get(storeA);
+        });
+        var dispatcher = Coldstorage.createDispatcher([
+            storeA,
+            storeB
+        ]);
+        test.throws(
+            function () { dispatcher.dispatch("something"); },
+            /^Cycle detected "a → b → a"$/
+        );
         test.done();
     }
 };

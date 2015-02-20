@@ -48,7 +48,7 @@ exports.createDispatcher = {
         );
         test.done();
     },
-    normal: function (test) {
+    normalAndSerialize: function (test) {
         var store = Coldstorage.createStore("a", function (old) {
             return old.set("hello", "hi");
         });
@@ -62,6 +62,28 @@ exports.createDispatcher = {
         );
         test.done();
     },
+    deserialize: function (test) {
+        var storeA = Coldstorage.createStore("a", function (old) {
+            return old.set("some", "value");
+        }, true);
+        var storeB = Coldstorage.createStore("b", function (old) {
+            return old.set("some", "value");
+        }, false);
+        var dispatcher = Coldstorage.createDispatcher([
+            storeA,
+            storeB
+        ]);
+        test.deepEqual(dispatcher.get(storeB).toJS(), {});
+        dispatcher = dispatcher.deserialize({"a": {"some": "value"}, "b": {"other": "value"}});
+
+        test.deepEqual(dispatcher.get(storeB).toJS(), {"some": "value"});
+
+        test.deepEqual(
+            dispatcher.serialize(),
+            {"a": {"some": "value"}}
+        );
+        test.done();
+    },
     cycle: function (test) {
         var storeA, storeB;
         storeA = Coldstorage.createStore("a", function (old, get) {
@@ -70,13 +92,15 @@ exports.createDispatcher = {
         storeB = Coldstorage.createStore("b", function (old, get) {
             get(storeA);
         });
-        var dispatcher = Coldstorage.createDispatcher([
-            storeA,
-            storeB
-        ]);
+        var dispatcherA = Coldstorage.createDispatcher([storeA, storeB]);
+        var dispatcherB = Coldstorage.createDispatcher([storeB, storeA]);
         test.throws(
-            function () { dispatcher.dispatch("something"); },
+            function () { dispatcherA.dispatch("something"); },
             /^Cycle detected "a → b → a"$/
+        );
+        test.throws(
+            function () { dispatcherB.dispatch("something"); },
+            /^Cycle detected "b → a → b"$/
         );
         test.done();
     }

@@ -1,4 +1,3 @@
-
 "use strict";
 var Immutable = require("immutable");
 var Utils = require("./utils");
@@ -14,7 +13,7 @@ var dispatch = function (state, emits) {
     var waiting = Immutable.OrderedSet();
 
     getStore = function(whatStore) {
-        return get(whatStore.key);
+        return get(whatStore.id);
     };
 
     get = function (what) {
@@ -28,16 +27,14 @@ var dispatch = function (state, emits) {
         );
 
         var oldstate = state.storesState.get(what, Immutable.Map());
-        var func = state.stores.get(what).func;
+        var func = state.stores.get(what).update;
 
         waiting = waiting.add(what);
         var res = func(oldstate, getStore);
         waiting.remove(what);
-
         emits = emits.set(what, res);
         return res;
     };
-
     var newState = state.stores.map(getStore);
     return state.set("storesState", newState);
 };
@@ -50,12 +47,11 @@ var dispatchAction = function (state, action, payload) {
 };
 
 var serialize = function (state) {
-    var lol = state.stores.filter(function (val, store) {
-        return state.stores.get(store).exports && state.storesState.has(store);
+    return state.stores.filter(function (val, store) {
+        return state.stores.get(store).serialize && state.storesState.has(store);
     }).map(function (val, store) {
         return state.storesState.get(store);
     }).toJS();
-    return lol;
 };
 
 var deserialize = function (state, object) {
@@ -63,14 +59,13 @@ var deserialize = function (state, object) {
     Utils.assert(Immutable.Map.isMap(object), "Object must be a map");
 
     object = object.filter(function (val, key) {
-        return state.stores.has(key) && state.stores.get(key).exports;
+        return state.stores.has(key) && state.stores.get(key).serialize;
     });
-
     return dispatch(state, object);
 };
 
 var getStoreState = function (state, store) {
-    return state.storesState.get(store.key, Immutable.Map());
+    return state.storesState.get(store.id, Immutable.Map());
 };
 
 var wrapDispatcher = function (state) {
@@ -107,12 +102,10 @@ var createDispatcher = function (stores) {
     }), "Every item in `stores` must be created by Coldstorage.createStore");
 
     stores = stores.toSetSeq().toMap().mapKeys(function (key) {
-        return key.key;
+        return key.id;
     });
     return wrapDispatcher(new DispatcherState({stores: stores}));
 };
-
-
 
 module.exports = {
     createDispatcher: createDispatcher

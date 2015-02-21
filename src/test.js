@@ -7,15 +7,18 @@ var noop = function () { return; };
 
 exports.createStore = {
     normal: function (test) {
-        var state = Coldstorage.createStore("name", noop);
-        test.deepEqual(state.toJS(), {key: "name", func: noop, _state: {}, exports: true});
+        var state = Coldstorage.createStore({
+            id: "name",
+            update: noop
+        });
+        test.deepEqual(state.toJS(), {id: "name", update: noop, serialize: true});
         test.done();
     },
     wrongName: function (test) {
         Immutable.Seq.of(undefined, 1234, null, [], {}).forEach(function (val) {
             test.throws(
-                function () { Coldstorage.createStore(val, noop); },
-                /^"key" must be of type "string"$/
+                function () { Coldstorage.createStore({id: val, update: noop}); },
+                /^"id" must be of type "string"$/
             );
         });
         test.done();
@@ -43,14 +46,17 @@ exports.createDispatcher = {
     },
     nonStore: function (test) {
         test.throws(
-            function () {Coldstorage.createDispatcher([1, 2]); },
+            function () { Coldstorage.createDispatcher([1, 2]); },
             /^Every item in `stores` must be created by Coldstorage\.createStore$/
         );
         test.done();
     },
     normalAndSerialize: function (test) {
-        var store = Coldstorage.createStore("a", function (old) {
-            return old.set("hello", "hi");
+        var store = Coldstorage.createStore({
+            id: "a",
+            update: function (old) {
+                return old.set("hello", "hi");
+            }
         });
         var dispatcher = Coldstorage.createDispatcher([
             store
@@ -63,16 +69,22 @@ exports.createDispatcher = {
         test.done();
     },
     deserialize: function (test) {
-        var storeA = Coldstorage.createStore("a", function (old) {
-            return old.set("some", "value");
-        }, true);
-        var storeB = Coldstorage.createStore("b", function (old) {
-            return old.set("some", "value");
-        }, false);
-        var dispatcher = Coldstorage.createDispatcher([
-            storeA,
-            storeB
-        ]);
+        var storeA = Coldstorage.createStore({
+            id: "a",
+            update: function (old) {
+                return old.set("some", "value");
+            },
+            serialize: true
+        });
+        var storeB = Coldstorage.createStore({
+            id: "b",
+            update: function (old) {
+                return old.set("some", "value");
+            },
+            serialize: false
+        });
+
+        var dispatcher = Coldstorage.createDispatcher([storeA, storeB]);
         test.deepEqual(dispatcher.get(storeB).toJS(), {});
         dispatcher = dispatcher.deserialize({"a": {"some": "value"}, "b": {"other": "value"}});
 
@@ -86,11 +98,17 @@ exports.createDispatcher = {
     },
     cycle: function (test) {
         var storeA, storeB;
-        storeA = Coldstorage.createStore("a", function (old, get) {
-            get(storeB);
+        storeA = Coldstorage.createStore({
+            id: "a",
+            update: function (old, get) {
+                get(storeB);
+            }
         });
-        storeB = Coldstorage.createStore("b", function (old, get) {
-            get(storeA);
+        storeB = Coldstorage.createStore({
+            id: "b",
+            update: function (old, get) {
+                get(storeA);
+            }
         });
         var dispatcherA = Coldstorage.createDispatcher([storeA, storeB]);
         var dispatcherB = Coldstorage.createDispatcher([storeB, storeA]);

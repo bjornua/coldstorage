@@ -1,23 +1,25 @@
 "use strict";
 
 var Immutable = require("immutable");
-var utils = require("./utils");
+var Utils = require("./utils");
 var Store = Immutable.Record({
-    key: undefined,
-    func: undefined,
-    exports: undefined,
-    _state: Immutable.Map()
+    id: undefined,
+    update: undefined,
+    serialize: undefined
 }, "Store");
 
-var createStore = function (key, func, exports) {
-    if (exports === undefined) {
-        exports = true;
-    }
-    utils.assertType(key, "string", "key");
-    utils.assertType(func, "function", "func");
-    utils.assertType(exports, "boolean", "exports");
+var createStore = function (options) {
+    options = Immutable.fromJS(options);
+    Utils.assert(Immutable.Map.isMap(options), "Options must be a map");
 
-    return new Store({key: key, func: func, exports: exports});
+    var id = options.get("id");
+    var update = options.get("update");
+    var serialize = options.get("serialize", true);
+    Utils.assertType(id, "string", "id");
+    Utils.assertType(update, "function", "update");
+    Utils.assertType(serialize, "boolean", "serialize");
+
+    return new Store({id: id, update: update, serialize: serialize});
 };
 
 

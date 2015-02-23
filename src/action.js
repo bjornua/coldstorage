@@ -15,8 +15,10 @@ var createActions = function () {
     utils.assert(actions.size > 0, "You didn't specify any action names");
 
     var obj = {};
+    if (actions.some(function (val) { return typeof val !== "string"; })) {
+        throw new Error("\"Action\" must be of type \"string\"");
+    }
     actions = actions.map(function (name) {
-        utils.assertType(name, "string", "Action");
         var list = new Action({prefix: id, name: name});
         obj[name] = list;
     });

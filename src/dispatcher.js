@@ -70,8 +70,15 @@ var deserialize = function (state, object) {
     return dispatch(state, object);
 };
 
-var getStoreState = function (state, store) {
-    return state.storesState.get(store.id, Immutable.Map());
+var getStoreState = function (state, path) {
+    path = Immutable.fromJS(path);
+    Utils.assert(Immutable.List.isList(path), "Path must be array");
+
+    var store = path.get(0);
+    Utils.assert(store instanceof Store.Store, "path[0] must be instance of store");
+    path = path.set(0, store.id);
+
+    return state.storesState.getIn(path);
 };
 
 var wrapDispatcher = function (state) {
@@ -81,8 +88,8 @@ var wrapDispatcher = function (state) {
     var serializeWrapped = function () {
         return serialize(state);
     };
-    var getWrapped = function (store) {
-        return getStoreState(state, store);
+    var getWrapped = function (path) {
+        return getStoreState(state, path);
     };
     var deserializeWrapped = function (object) {
         return wrapDispatcher(deserialize(state, object));

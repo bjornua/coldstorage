@@ -85,10 +85,10 @@ exports.createDispatcher = {
         });
 
         var dispatcher = Coldstorage.createDispatcher([storeA, storeB]);
-        test.deepEqual(dispatcher.get(storeB).toJS(), {});
+        test.deepEqual(dispatcher.get([storeB]), undefined);
         dispatcher = dispatcher.deserialize({"a": {"some": "value"}, "b": {"other": "value"}});
 
-        test.deepEqual(dispatcher.get(storeB).toJS(), {"some": "value"});
+        test.deepEqual(dispatcher.get([storeB]).toJS(), {"some": "value"});
 
         test.deepEqual(
             dispatcher.serialize(),

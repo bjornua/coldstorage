@@ -96,7 +96,7 @@ exports.createDispatcher = {
         );
         test.done();
     },
-    cycle: function (test) {
+    cycle2: function (test) {
         var storeA, storeB;
         storeA = Coldstorage.createStore({
             id: "a",
@@ -120,6 +120,43 @@ exports.createDispatcher = {
             function () { dispatcherB.dispatch("something"); },
             /^Cycle detected "b → a → b"$/
         );
+        test.done();
+    },
+    cycle1: function (test) {
+        var store;
+        store = Coldstorage.createStore({
+            id: "a",
+            update: function (old, get) {
+                get(store);
+            }
+        });
+        var dispatcher = Coldstorage.createDispatcher([store]);
+        test.throws(
+            function () { dispatcher.dispatch("something"); },
+            /^Cycle detected "a → a"$/
+        );
+        test.done();
+    },
+    get: function (test) {
+        var actions = Coldstorage.createActions("called", "notcalled");
+        Coldstorage.createDispatcher([Coldstorage.createStore({
+            id: "a",
+            update: function (old, get) {
+                test.deepEqual(get(actions.called).toJS(), {});
+                test.strictEqual(get(actions.notcalled), undefined);
+                return old;
+            }
+        })]).dispatch(actions.called, {});
+
+        Coldstorage.createDispatcher([Coldstorage.createStore({
+            id: "a",
+            update: function (old, get) {
+                test.deepEqual(get(actions.called), undefined);
+                test.strictEqual(get(actions.notcalled), undefined);
+                return old;
+            }
+        })]).dispatch(actions.called);
+
         test.done();
     }
 };

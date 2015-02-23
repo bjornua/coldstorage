@@ -2,6 +2,7 @@
 var Immutable = require("immutable");
 var Utils = require("./utils");
 var Store = require("./store");
+var Action = require("./action");
 
 var DispatcherState = Immutable.Record({
     stores: Immutable.OrderedMap(),
@@ -9,14 +10,15 @@ var DispatcherState = Immutable.Record({
 }, "DispatcherState");
 
 var dispatch = function (state, emits) {
-    var get, getStore;
+    var get;
     var waiting = Immutable.OrderedSet();
 
-    getStore = function(whatStore) {
-        return get(whatStore.id);
-    };
-
     get = function (what) {
+        if (what instanceof Store.Store) {
+            what = what.id;
+        } else {
+            Utils.assert(what instanceof Action.Action);
+        }
         if (emits.has(what)) {
             return emits.get(what);
         }
@@ -27,22 +29,23 @@ var dispatch = function (state, emits) {
         );
 
         var oldstate = state.storesState.get(what, Immutable.Map());
-        var func = state.stores.get(what).update;
-
+        var store = state.stores.get(what);
+        if (store === undefined) {
+            return undefined;
+        }
+        var func = store.update;
         waiting = waiting.add(what);
-        var res = func(oldstate, getStore);
+        var res = func(oldstate, get);
         waiting.remove(what);
         emits = emits.set(what, res);
         return res;
     };
-    var newState = state.stores.map(getStore);
+    var newState = state.stores.map(get);
     return state.set("storesState", newState);
 };
 
 var dispatchAction = function (state, action, payload) {
-    var emits = Immutable.Map({
-        action: payload
-    });
+    var emits = Immutable.Map().set(action, Immutable.fromJS(payload));
     return dispatch(state, emits);
 };
 

@@ -45,6 +45,9 @@ var dispatch = function (state, emits) {
 };
 
 var dispatchAction = function (state, action, payload) {
+    if (payload === undefined) {
+        payload = {};
+    }
     var emits = Immutable.Map().set(action, Immutable.fromJS(payload));
     return dispatch(state, emits);
 };

@@ -151,7 +151,7 @@ exports.createDispatcher = {
         Coldstorage.createDispatcher([Coldstorage.createStore({
             id: "a",
             update: function (old, get) {
-                test.deepEqual(get(actions.called), undefined);
+                test.deepEqual(get(actions.called).toJS(), {});
                 test.strictEqual(get(actions.notcalled), undefined);
                 return old;
             }

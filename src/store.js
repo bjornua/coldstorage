@@ -1,34 +1,29 @@
-'use strict';
+"use strict";
 
-var Immutable = require('immutable');
-var Action = require('./action');
-
+var Immutable = require("immutable");
+var Utils = require("./utils");
 var Store = Immutable.Record({
-    name: undefined,
-    nodes: Immutable.List(),
-    on: function (deps, f) {
-        deps = Immutable.List(deps);
-        deps = deps.map(function (val) {
-            if (val instanceof Store) {
-                return val.name;
-            }
-            if (val instanceof Action.Action) {
-                return val;
-            }
-            throw new TypeError('Cannot listen object of type ' + typeof val);
-        });
+    id: undefined,
+    update: undefined,
+    serialize: undefined
+}, "Store");
 
-        return this.set('nodes', this.nodes.push(
-            Immutable.List.of(this.name, deps, f)
-        ));
-    }
-}, 'Store');
+var createStore = function (options) {
+    options = Immutable.fromJS(options);
+    Utils.assert(Immutable.Map.isMap(options), "Options must be a map");
 
-var createStore = function (name) {
-    if ('string' !== typeof name) {
-        throw new TypeError('Store name must be of type string');
-    }
-    return new Store({name: name});
+    var id = options.get("id");
+    var update = options.get("update");
+    var serialize = options.get("serialize", true);
+    Utils.assertType(id, "string", "id");
+    Utils.assertType(update, "function", "update");
+    Utils.assertType(serialize, "boolean", "serialize");
+
+    return new Store({id: id, update: update, serialize: serialize});
 };
 
-module.exports.createStore = createStore;
+
+module.exports = {
+    Store: Store,
+    createStore: createStore
+};

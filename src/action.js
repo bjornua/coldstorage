@@ -1,33 +1,30 @@
-'use strict';
-
-var Immutable = require('immutable');
+"use strict";
+var Immutable = require("immutable");
+var utils = require("./utils");
 
 var Action = Immutable.Record({
     prefix: undefined,
     name: undefined
-}, 'Action');
+}, "Action");
 
 
 var id = 0;
-var createActions = function (actions) {
-    actions = Immutable.List(actions);
+var createActions = function () {
+    var actions = Immutable.List(arguments);
 
-    if (actions.size === 0) {
-        throw new Error("You didn't specify any action names");
-    }
+    utils.assert(actions.size > 0, "You didn't specify any action names");
 
     var obj = {};
+    if (actions.some(function (val) { return typeof val !== "string"; })) {
+        throw new Error("\"Action\" must be of type \"string\"");
+    }
     actions = actions.map(function (name) {
-        if ('string' !== typeof name) {
-            throw new TypeError('Action name must be of type string');
-        }
         var list = new Action({prefix: id, name: name});
         obj[name] = list;
     });
     id += 1;
     return Object.freeze(obj);
 };
-
 
 module.exports = {
     Action: Action,

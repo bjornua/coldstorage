@@ -14,7 +14,6 @@ Immutable dispatcher for the flux architecture.
 * Stores can listen to stores
 * Stores can listen to actions
 * Stores can listen to many stores/actions at once
-* Built-in early detection of cycles avoids infinite loops.
 
 ## Installing
 Coldstorage is implemented using CommonJS. Currently coldstorage is distributed using `npm`. It can be installed by running

@@ -17,7 +17,7 @@ var dispatch = function (state, emits) {
         if (what instanceof Store.Store) {
             what = what.id;
         } else {
-            Utils.assert(what instanceof Action.Action);
+            Utils.assert(what instanceof Action.Action, "{} is not a valid action.", what);
         }
         if (emits.has(what)) {
             return emits.get(what);
@@ -45,6 +45,7 @@ var dispatch = function (state, emits) {
 };
 
 var dispatchAction = function (state, action, payload) {
+    Utils.assert(action instanceof Action.Action, "{} is not a valid action.", action);
     if (payload === undefined) {
         payload = {};
     }
